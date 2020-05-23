@@ -1,0 +1,4 @@
+May 23, 2020
+
+Refactor drawBlock function, we do a check inside here but we should
+modularize the check function and return the valid positioning.
