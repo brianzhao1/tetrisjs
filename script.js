@@ -12,6 +12,7 @@ var holdWidth = 6;
 var queueWidth = 6;
 var boardWidth = 10;
 var boardHeight = 24;
+var headerHeight = 2;
 var unitSize = 25;
 var gravity = 2;
 var currentx = 3;
@@ -40,11 +41,19 @@ function draw() {
     drawQueue();
     drawHold();
     drawBoard();
-    drawGhost(incoming);
-    let result = drawBlock(incoming, incoming.color);
+
+    let result = drawGhost(incoming);
+    if (!result) {
+        gameOver();
+    }
+
+    drawBlock(incoming, incoming.color);
+    drawHeader();
+
     if (frameCount % 60 == 0) {
         board.moveBlockDown(incoming);
     }
+
     drawScore();
 }
 
@@ -68,6 +77,11 @@ function keyPressed() {
     }
 }
 
+function gameOver() {
+    board = new Board();
+    console.log('game over sir');
+}
+
 function holdBlock(block) {
     if (usedHold) {
         return;
@@ -79,6 +93,7 @@ function holdBlock(block) {
     held = new Block(block.color);
     refresh();
 }
+
 function refresh() {
     if (queue.length <= 3) {
         shuffleColors();
@@ -103,7 +118,7 @@ function shuffleColors() {
 function drawScore() {
     textSize(32);
     fill('white');
-    text(board.score, holdWidth * unitSize + 10, 32);
+    text(board.score, holdWidth * unitSize + 10, headerHeight * unitSize + 32);
 }
 
 function drawBlock(block, color) {
@@ -111,16 +126,24 @@ function drawBlock(block, color) {
         starty = unitSize * block.y;
     let bucket = [];
 
-    // console.log(block.rotation);
     for (points of block.rotation) {
         let blockx = unitSize * points[0],
             blocky = unitSize * points[1];
         let finalx = startx + blockx,
             finaly = starty + blocky;
         fill(color);
+
+        // TOP OUT / GAME OVER CHECK
+        let prevColor = get(finalx + unitSize / 2, finaly + unitSize / 2);
+        let occupant = board.isOccupiedAt(block.y + points[1], block.x + points[0]);
+        if (color == 'gray' && occupant != 0) {
+            return false;
+        }
+
         rect(finalx, finaly, unitSize, unitSize);
-        // console.log(startx + blockx, starty + blocky, unitSize, unitSize);
     }
+
+    return true;
 }
 
 function drawBoard() {
@@ -129,8 +152,6 @@ function drawBoard() {
             let color = board.isOccupiedAt(row, col);
             fill(color);
             rect((col + holdWidth) * unitSize, row * unitSize, unitSize, unitSize);
-            // console.log(col, row);
-            // console.log(row, col);
         }
     }
 }
@@ -140,7 +161,7 @@ function drawQueue() {
     rect((holdWidth + boardWidth) * unitSize, 0, queueWidth * unitSize, boardHeight * unitSize);
     noErase();
     let queuex = boardWidth + 1,
-        queuey = 1;
+        queuey = 1 + headerHeight;
     for (let i = 0; i < 3; i++) {
         let queueColor = queue[i],
             queueBlock = new Block(queueColor, [queuex, queuey]);
@@ -161,12 +182,18 @@ function drawHold() {
     rect(holdx, holdy, holdWidth * unitSize, boardHeight * unitSize);
     noErase();
 
-    let heldDrawBlock = new Block(held.color, [holdx - holdWidth + 1, holdy]);
+    let heldDrawBlock = new Block(held.color, [holdx - holdWidth + 1, holdy + headerHeight]);
     this.drawBlock(heldDrawBlock, held.color);
+}
+
+function drawHeader() {
+    erase();
+    rect(holdWidth * unitSize, 0, boardWidth * unitSize, headerHeight * unitSize);
+    noErase();
 }
 
 function drawGhost(block) {
     var ghost = block.copy();
     while (board.moveBlockDown(ghost));
-    drawBlock(ghost, 'gray');
+    return drawBlock(ghost, 'gray');
 }

@@ -30,11 +30,11 @@ Board
 
 May 24, 2020
 
-Code game over function
+x Code game over function
 X Fix initial positions, spawn position
 x Kicks? (bonus points)
 Disable sound on esc
 time limit for placement
 fix colors
-hold piece, incoming pieces
+x hold piece, incoming pieces
 https://p5js.org/learn/color.html
