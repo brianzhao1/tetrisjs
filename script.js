@@ -53,7 +53,6 @@ function keyPressed() {
     } else if (key === ' ') {
         board.setBlock(incoming);
         refresh();
-        console.log(queue);
     } else if (keyCode === 88) { // x
         board.rotateBlockLeft(incoming);
     } else if (keyCode === 90) { // z
