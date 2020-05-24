@@ -62,20 +62,14 @@ for (var i = 0; i < colors.length; i++) {
     mapping[color] = position;
 }
 
-console.log(mapping);
-
 class Block {
     constructor(color, position) {
         this.color = color;
-        // console.log(color);
-        // console.log(mapping[color]);
         this.delta = 0;
         this.position = position;
     }
 
     get rotation() {
-        // console.log(this.delta, this.rotations.length);
-        // console.log(this.rotations[this.delta % this.rotations.length]);
         return mapping[this.color][(((this.delta % 4) + 4) % 4)];
     }
 
@@ -92,7 +86,6 @@ class Block {
     }
 
     moveRight() {
-        console.log(this, 1);
         this.position[0] += 1;
     }
 
@@ -102,8 +95,6 @@ class Block {
 
     rotateLeft() {
         this.delta += 1;
-        console.log(this.rotation);
-        console.log(this.delta);
     }
 
     rotateRight() {
