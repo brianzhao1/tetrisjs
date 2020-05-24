@@ -8,28 +8,33 @@ var colors = [
     'green',
 ];
 
+var queueWidth = 5;
 var boardWidth = 10;
 var boardHeight = 24;
 var unitSize = 25;
 var gravity = 2;
-var currentx = Math.floor((boardWidth  - 1) / 2);
+var currentx = 3;
 var currenty = 0;
 
 var incomingColor;
 var incoming;
 var iteration;
 var board;
+var queue;
 
 function setup() {
-    createCanvas(boardWidth * unitSize, boardHeight * unitSize);
+    createCanvas((boardWidth + queueWidth) * unitSize, boardHeight * unitSize);
     board = new Board();
     iteration = 0;
+    queue = [];
+    shuffleColors();
     refresh();
 }
 
 function draw() {
-    background(0);
-    drawBoard(board);
+    // background(0);
+    drawBoard();
+    drawQueue();
     drawGhost(incoming);
     let result = drawBlock(incoming, incoming.color);
     if (frameCount % 60 == 0) {
@@ -48,6 +53,7 @@ function keyPressed() {
     } else if (key === ' ') {
         board.setBlock(incoming);
         refresh();
+        console.log(queue);
     } else if (keyCode === 88) { // x
         board.rotateBlockLeft(incoming);
     } else if (keyCode === 90) { // z
@@ -56,8 +62,11 @@ function keyPressed() {
 }
 
 function refresh() {
-    iteration = ((iteration % colors.length) + colors.length) % colors.length
-    incomingColor = colors[iteration++];
+    if (queue.length <= 3) {
+        shuffleColors();
+    }
+    iteration = (iteration + 1) % colors.length;
+    incomingColor = queue.shift();
     incoming = new Block(incomingColor, [currentx, currenty]);
 }
 
@@ -70,7 +79,7 @@ function shuffleColors() {
         let j = Math.floor(Math.random() * (i + 1));
         [bag[i], bag[j]] = [bag[j], bag[i]];
     }
-    colors = bag;
+    queue.push(...bag);
 }
 
 function drawScore() {
@@ -96,7 +105,7 @@ function drawBlock(block, color) {
     }
 }
 
-function drawBoard(board) {
+function drawBoard() {
     for (var row = 0; row < boardHeight; row++) {
         for (var col = 0; col < boardWidth; col++) {
             let color = board.isOccupiedAt(row, col);
@@ -105,6 +114,14 @@ function drawBoard(board) {
             // console.log(col, row);
             // console.log(row, col);
         }
+    }
+}
+
+function drawQueue() {
+    let queuex = boardWidth + 1,
+        queuey = 0;
+    for (let queueColor of queue) {
+        console.log(queueColor);
     }
 }
 

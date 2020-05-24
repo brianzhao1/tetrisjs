@@ -44,6 +44,8 @@ class Board {
     }
 
     rotateBlockLeft(block) {
+        while (!this.simulate(block, block.rotateLeft) && this.moveBlockRight(block));
+        while (!this.simulate(block, block.rotateLeft) && this.moveBlockLeft(block));
         if (this.simulate(block, block.rotateLeft)) {
             block.rotateLeft();
             return true;
@@ -52,6 +54,8 @@ class Board {
     }
 
     rotateBlockRight(block) {
+        while (!this.simulate(block, block.rotateRight) && this.moveBlockRight(block));
+        while (!this.simulate(block, block.rotateRight) && this.moveBlockLeft(block));
         if (this.simulate(block, block.rotateRight)) {
             block.rotateRight();
             return true;
@@ -142,11 +146,3 @@ class Board {
     }
 }
 
-// var test = new Board();
-// var blo = new Block('purple', [5, 0]);
-// for (var i = 0; i < 3; i++) {
-//     blo.moveRight();
-// }
-// console.log(test.simulate(blo, blo.moveRight));
-// console.log(test.validate(blo));
-// console.log(blo.position);
