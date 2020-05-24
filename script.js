@@ -1,5 +1,5 @@
 var colors = [
-    'white',
+    'aqua',
     'orange',
     'blue',
     'yellow',
@@ -12,7 +12,7 @@ var boardWidth = 10;
 var boardHeight = 24;
 var unitSize = 25;
 var gravity = 2;
-var currentx = 5;
+var currentx = 4;
 var currenty = 0;
 
 var incomingColor;
@@ -26,6 +26,7 @@ function setup() {
     incomingColor = colors[Math.floor(Math.random() * colors.length)];
     incomingColor = 'blue';
     incoming = new Block(incomingColor, [currentx, currenty]);
+    console.log(currentx, incoming.x);
 }
 
 function draw() {
@@ -34,7 +35,9 @@ function draw() {
     let result = drawBlock(incoming, currentx, currenty);
     if (frameCount % 60 == 0) {
         board.moveBlockDown(incoming);
+        console.log(incoming.x);
     }
+    drawScore();
 }
 
 function keyPressed() {
@@ -71,6 +74,12 @@ function refresh() {
     incoming = new Block(incomingColor, [currentx, currenty]);
 }
 
+function drawScore() {
+    textSize(32);
+    fill('white');
+    text(board.score, 10, 32);
+}
+
 function drawBlock(block, x, y) {
     let startx = unitSize * block.x,
         starty = unitSize * block.y;
@@ -91,7 +100,7 @@ function drawBlock(block, x, y) {
 function drawBoard(board) {
     for (var row = 0; row < boardHeight; row++) {
         for (var col = 0; col < boardWidth; col++) {
-            let color = board.occupied(row, col);
+            let color = board.isOccupiedAt(row, col);
             fill(color);
             rect(col * unitSize, row * unitSize, unitSize, unitSize);
             // console.log(col, row);
