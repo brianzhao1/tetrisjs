@@ -1,5 +1,5 @@
-var boardWidth = 10;
-var boardHeight = 24;
+var boardWidth = 24,
+    boardHeight = 24;
 
 function getNewGrid() {
     var grid = [];

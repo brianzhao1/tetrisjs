@@ -1,11 +1,11 @@
 var colors = [
-    'aqua',
-    'orange',
-    'blue',
-    'yellow',
-    'red',
-    'green',
-    'purple',
+    '#00DBFF', // aqua
+    '#FF971C', // orange
+    '#0341AE', // blue
+    '#FFD500', // yellow
+    '#FF3213', // red
+    '#72CB3B', // green
+    '#5E058B', // purple
 ];
 
 var positions = [
