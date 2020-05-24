@@ -15,74 +15,87 @@ var gravity = 2;
 var currentx = 5;
 var currenty = 0;
 
-var incomingColor = colors[Math.floor(Math.random() * colors.length)];
+var incomingColor;
 var incoming;
+
+var board;
 
 function setup() {
     createCanvas(boardWidth * unitSize, boardHeight * unitSize);
-    incoming = new Block(incomingColor);
+    board = new Board();
+    incomingColor = colors[Math.floor(Math.random() * colors.length)];
+    incomingColor = 'blue';
+    incoming = new Block(incomingColor, [currentx, currenty]);
 }
 
 function draw() {
     background(0);
-    // console.log(incomingColor);
+    drawBoard(board);
     let result = drawBlock(incoming, currentx, currenty);
-    if (!result) {
-        incoming = new Block(incomingColor);
-    } else if (frameCount % 60 == 0) {
-        currenty gravity;
+    if (frameCount % 60 == 0) {
+        board.moveBlockDown(incoming);
     }
 }
 
 function keyPressed() {
     if (keyCode === LEFT_ARROW) {
-        currentx -= 1;
+        // incoming.moveLeft();
+        board.moveBlockLeft(incoming);
+        console.log(incoming.position);
     } else if (keyCode === RIGHT_ARROW) {
-        currentx += 1;
-    } else if (keyCode == 88) {
+        // incoming.moveRight();
+        board.moveBlockRight(incoming);
+    } else if (keyCode === DOWN_ARROW) {
+        board.moveBlockDown(incoming);
+    } else if (key === ' ') {
+        board.setBlock(incoming);
+        console.log(board.grid);
+        refresh();
+    } else if (keyCode === 88) {
         console.log('x pressed');
-        incoming.delta += 1;
-    } else if (keyCode == 90) {
-        incoming.delta -= 1;
+        board.rotateBlockLeft(incoming);
+    } else if (keyCode === 90) {
+        board.rotateBlockRight(incoming);
     }
 }
 
-function reset() {
+// function reset() {
+//     incomingColor = colors[Math.floor(Math.random() * colors.length)];
+//     incoming = new Block(incomingColor, [currentx, currenty]);
+//     currentx = 5;
+//     currenty = 0;
+// }
+
+function refresh() {
     incomingColor = colors[Math.floor(Math.random() * colors.length)];
-    incoming = new Block(incomingColor);
-    currentx = 5;
-    currenty = 0;
+    incoming = new Block(incomingColor, [currentx, currenty]);
 }
 
-function freeCheck(color) {
-    return (color[0] == 0 && color[1] == 0 && color[2] == 0);
-}
 function drawBlock(block, x, y) {
-    let startx = unitSize * x;
-    let starty = unitSize * y;
+    let startx = unitSize * block.x,
+        starty = unitSize * block.y;
     let bucket = [];
 
-    for (points of block.position) {
+    // console.log(block.rotation);
+    for (points of block.rotation) {
         let blockx = unitSize * points[0],
             blocky = unitSize * points[1];
         let finalx = startx + blockx,
             finaly = starty + blocky;
-        let color = get(finalx + unitSize / 2, finaly + unitSize / 2);
-        console.log(finaly / unitSize);
-        if (finaly / unitSize >= boardHeight || !freeCheck(color)) {
-            return false;
-        } else {
-            bucket.push([finalx, finaly]);
-        }
-    }
-
-    for (finalPoint of bucket) {
-        let finalx = finalPoint[0],
-            finaly = finalPoint[1];
         fill(block.color);
         rect(finalx, finaly, unitSize, unitSize);
         // console.log(startx + blockx, starty + blocky, unitSize, unitSize);
     }
+}
 
-    return true;
+function drawBoard(board) {
+    for (var row = 0; row < boardHeight; row++) {
+        for (var col = 0; col < boardWidth; col++) {
+            let color = board.occupied(row, col);
+            fill(color);
+            rect(col * unitSize, row * unitSize, unitSize, unitSize);
+            // console.log(col, row);
+            // console.log(row, col);
+        }
+    }
 }
