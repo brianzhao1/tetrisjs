@@ -21,7 +21,6 @@ class Board {
 
     moveBlockLeft(block) {
         if (this.simulate(block, block.moveLeft)) {
-            console.log("simulation passed");
             block.moveLeft();
             return true;
         }
@@ -61,9 +60,7 @@ class Board {
     }
 
     setBlock(block) {
-        console.log('setting now');
         while (this.moveBlockDown(block));
-        console.log('setting block');
         let startx = block.x,
             starty = block.y;
 
@@ -82,7 +79,6 @@ class Board {
         var score = 0;
         for (var bottom = boardHeight - 1; bottom >= 0; bottom--) {
             var shouldClear = true;
-            console.log(bottom, this.grid[bottom]);
             for (var el of this.grid[bottom]) {
                 if (el == 0) {
                     shouldClear = false;
@@ -125,7 +121,6 @@ class Board {
                 blocky = points[1];
             let finalx = startx + blockx,
                 finaly = starty + blocky;
-            console.log('look here', finalx, finaly);
             if ((finalx < 0 || finalx >= boardWidth) ||
                 (finaly >= boardHeight) ||
                 this.isOccupiedAt(finaly, finalx)) {
@@ -140,22 +135,18 @@ class Board {
         var tempBoard = this.copy();
         var tempBlock = block.copy();
 
-        // console.log("temp", tempBlock.position);
-        // console.log("block", block.position);
         var testFunc = action.bind(tempBlock);
         testFunc();
-        // console.log("tempafter", tempBlock.position);
-        // console.log("blockafter",block.position);
 
         return tempBoard.validate(tempBlock);
     }
 }
 
-var test = new Board();
-var blo = new Block('purple', [5, 0]);
-for (var i = 0; i < 3; i++) {
-    blo.moveRight();
-}
-console.log(test.simulate(blo, blo.moveRight));
+// var test = new Board();
+// var blo = new Block('purple', [5, 0]);
+// for (var i = 0; i < 3; i++) {
+//     blo.moveRight();
+// }
+// console.log(test.simulate(blo, blo.moveRight));
 // console.log(test.validate(blo));
 // console.log(blo.position);

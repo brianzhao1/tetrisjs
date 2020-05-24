@@ -12,66 +12,65 @@ var boardWidth = 10;
 var boardHeight = 24;
 var unitSize = 25;
 var gravity = 2;
-var currentx = 4;
+var currentx = Math.floor((boardWidth  - 1) / 2);
 var currenty = 0;
 
 var incomingColor;
 var incoming;
-
+var iteration;
 var board;
 
 function setup() {
     createCanvas(boardWidth * unitSize, boardHeight * unitSize);
     board = new Board();
-    incomingColor = colors[Math.floor(Math.random() * colors.length)];
-    incomingColor = 'blue';
-    incoming = new Block(incomingColor, [currentx, currenty]);
-    console.log(currentx, incoming.x);
+    iteration = 0;
+    refresh();
 }
 
 function draw() {
     background(0);
     drawBoard(board);
-    let result = drawBlock(incoming, currentx, currenty);
+    drawGhost(incoming);
+    let result = drawBlock(incoming, incoming.color);
     if (frameCount % 60 == 0) {
         board.moveBlockDown(incoming);
-        console.log(incoming.x);
     }
     drawScore();
 }
 
 function keyPressed() {
     if (keyCode === LEFT_ARROW) {
-        // incoming.moveLeft();
         board.moveBlockLeft(incoming);
-        console.log(incoming.position);
     } else if (keyCode === RIGHT_ARROW) {
-        // incoming.moveRight();
         board.moveBlockRight(incoming);
     } else if (keyCode === DOWN_ARROW) {
         board.moveBlockDown(incoming);
     } else if (key === ' ') {
         board.setBlock(incoming);
-        console.log(board.grid);
         refresh();
-    } else if (keyCode === 88) {
-        console.log('x pressed');
+    } else if (keyCode === 88) { // x
         board.rotateBlockLeft(incoming);
-    } else if (keyCode === 90) {
+    } else if (keyCode === 90) { // z
         board.rotateBlockRight(incoming);
     }
 }
 
-// function reset() {
-//     incomingColor = colors[Math.floor(Math.random() * colors.length)];
-//     incoming = new Block(incomingColor, [currentx, currenty]);
-//     currentx = 5;
-//     currenty = 0;
-// }
-
 function refresh() {
-    incomingColor = colors[Math.floor(Math.random() * colors.length)];
+    iteration = ((iteration % colors.length) + colors.length) % colors.length
+    incomingColor = colors[iteration++];
     incoming = new Block(incomingColor, [currentx, currenty]);
+}
+
+function shuffleColors() {
+    var bag = [];
+    for (color of colors) {
+        bag.push(color);
+    }
+    for (let i = bag.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+    colors = bag;
 }
 
 function drawScore() {
@@ -80,7 +79,7 @@ function drawScore() {
     text(board.score, 10, 32);
 }
 
-function drawBlock(block, x, y) {
+function drawBlock(block, color) {
     let startx = unitSize * block.x,
         starty = unitSize * block.y;
     let bucket = [];
@@ -91,7 +90,7 @@ function drawBlock(block, x, y) {
             blocky = unitSize * points[1];
         let finalx = startx + blockx,
             finaly = starty + blocky;
-        fill(block.color);
+        fill(color);
         rect(finalx, finaly, unitSize, unitSize);
         // console.log(startx + blockx, starty + blocky, unitSize, unitSize);
     }
@@ -107,4 +106,10 @@ function drawBoard(board) {
             // console.log(row, col);
         }
     }
+}
+
+function drawGhost(block) {
+    var ghost = block.copy();
+    while (board.moveBlockDown(ghost));
+    drawBlock(ghost, 'gray');
 }

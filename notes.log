@@ -2,3 +2,37 @@ May 23, 2020
 
 Refactor drawBlock function, we do a check inside here but we should
 modularize the check function and return the valid positioning.
+
+Block
+    - color (string)
+    - position (tuple 0, 0)
+    - rotation (num 0, 1, 2, 3)
+
+    getters
+    - x
+    - y
+
+    methods
+    - shiftX
+    - shiftY
+    - rotateLeft
+    - rotateRight
+
+Board
+    - grid
+    
+    getters
+
+    methods
+    - getDropPosition(block)
+    - clearLines()
+    - 
+
+May 24, 2020
+
+Code game over function
+Fix initial positions, spawn position
+Kicks? (bonus points)
+Disable sound on esc
+time limit for placement
+fix colors
