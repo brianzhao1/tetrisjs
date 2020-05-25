@@ -25,10 +25,13 @@ var incomingColor,
     usedHold,
     iteration,
     board,
-    queue;
+    queue,
+    lockCount;
 
 function setup() {
-    createCanvas((holdWidth + boardWidth + queueWidth) * unitSize, boardHeight * unitSize);
+    var cnv = createCanvas((holdWidth + boardWidth + queueWidth) * unitSize, (boardHeight - headerHeight) * unitSize);
+    cnv.parent("game");
+    cnv.id("tetris");
     board = new Board();
     iteration = 0;
     queue = [];
@@ -43,28 +46,32 @@ function draw() {
     drawHold();
     drawBoard();
 
-    let result = drawGhost(incoming);
+    let result = drawBlock(incoming, incoming.color);
     if (!result) {
         gameOver();
     }
+    drawGhost(incoming);
 
-    drawBlock(incoming, incoming.color);
-    drawHeader();
+    if (frameCount % 20 == 0) {
+        let fall = board.moveBlockDown(incoming);
+        if (!fall) {
+            lockCount++;
+        } else {
+            lockCount = 0;
+        }
 
-    if (frameCount % 60 == 0) {
-        board.moveBlockDown(incoming);
+    }
+
+    if (lockCount > 1) {
+        board.setBlock(incoming);
+        usedHold = false;
+        refresh();
     }
 
     drawScore();
     if (keyIsDown(DOWN_ARROW)) {
         setTimeout(board.moveBlockDown(incoming), 1000);
     }
-    // if (frameCount % 10 == 0 && keyIsDown(LEFT_ARROW)) {
-    //     board.moveBlockLeft(incoming);
-    // }
-    // if (frameCount % 10 == 0 && keyIsDown(RIGHT_ARROW)) {
-    //     setTimeout(board.moveBlockRight(incoming), 1000);
-    // }
 }
 
 function keyPressed() {
@@ -88,8 +95,9 @@ function keyPressed() {
 }
 
 function gameOver() {
+    drawGameOver();
+    // setTimeout(() => { board = new Board(); }, 2000);
     board = new Board();
-    console.log('game over sir');
 }
 
 function holdBlock(block) {
@@ -105,12 +113,15 @@ function holdBlock(block) {
 }
 
 function refresh() {
+    // console.log(board.grid);
+    // console.log(incoming);
     if (queue.length <= 3) {
         shuffleColors();
     }
-    iteration = (iteration + 1) % colors.length;
+    // iteration = (iteration + 1) % colors.length;
     incomingColor = queue.shift();
     incoming = new Block(incomingColor, [currentx, currenty]);
+    lockCount = 0;
 }
 
 function shuffleColors() {
@@ -125,16 +136,10 @@ function shuffleColors() {
     queue.push(...bag);
 }
 
-function drawScore() {
-    textSize(32);
-    fill('white');
-    text(board.score, holdWidth * unitSize + 10, headerHeight * unitSize + 32);
-}
-
 function drawBlock(block, blockColor) {
     let startx = unitSize * (holdWidth + block.x),
-        starty = unitSize * block.y;
-    let bucket = [];
+        starty = unitSize * (block.y - headerHeight),
+        gameContinues = true;
 
     for (points of block.rotation) {
         let blockx = unitSize * points[0],
@@ -146,32 +151,29 @@ function drawBlock(block, blockColor) {
 
         // TOP OUT / GAME OVER CHECK
         let prevColor = get(finalx + unitSize / 2, finaly + unitSize / 2);
-        let occupant = board.isOccupiedAt(block.y + points[1], block.x + points[0]);
-        if (blockColor == 'gray' && occupant != 0) {
-            return false;
+        if (board.isOccupiedAt(block.y + points[1], block.x + points[0]) != 0) {
+            gameContinues = false;
         }
-
         rect(finalx, finaly, unitSize, unitSize, borderRadius);
         stroke(0);
-        if (blockColor != 'gray') {
-            // line(finalx, finaly, finalx + unitSize, finaly + unitSize);
-        }
     }
 
-    return true;
+    return gameContinues;
 }
 
 function drawBoard() {
-    for (var row = 0; row < boardHeight; row++) {
+    for (var row = headerHeight; row < boardHeight; row++) {
         for (var col = 0; col < boardWidth; col++) {
             let blockColor = board.isOccupiedAt(row, col);
             let c = color(blockColor);
             if (blockColor == 0) {
+                c = color('#656565');
+                c.setAlpha(50);
+            } else {
+                c.setAlpha(255);
             }
             fill(c);
-            c.setAlpha(255);
-            // fill(blockColor);
-            rect((col + holdWidth) * unitSize, row * unitSize, unitSize, unitSize, borderRadius);
+            rect((col + holdWidth) * unitSize, (row - headerHeight) * unitSize, unitSize, unitSize, borderRadius);
         }
     }
 }
@@ -181,10 +183,17 @@ function drawQueue() {
     rect((holdWidth + boardWidth) * unitSize, 0, queueWidth * unitSize, boardHeight * unitSize);
     noErase();
     let queuex = boardWidth + 1,
-        queuey = 1 + headerHeight;
+        queuey = 1 + headerHeight,
+        offset = 0.5;
     for (let i = 0; i < 3; i++) {
         let queueColor = queue[i],
-            queueBlock = new Block(queueColor, [queuex, queuey]);
+            offset;
+        if (queueColor == '#00DBFF' || queueColor == '#FFD500') {
+            offset = 0;
+        } else {
+            offset = 0.5;
+        }
+        let queueBlock = new Block(queueColor, [queuex + offset, queuey]);
         this.drawBlock(queueBlock, queueColor);
         queuey += 4;
     }
@@ -192,8 +201,8 @@ function drawQueue() {
 
 function drawHold() {
     let holdx = 0,
-        holdy = 0;
-
+        holdy = 0,
+        offset = 0.5;
     erase();
     rect(holdx, holdy, holdWidth * unitSize, boardHeight * unitSize);
     noErase();
@@ -202,14 +211,12 @@ function drawHold() {
         return;
     }
 
-    let heldDrawBlock = new Block(held.color, [holdx - holdWidth + 1, holdy + headerHeight]);
-    this.drawBlock(heldDrawBlock, held.color);
-}
+    if (held.color == '#00DBFF' || held.color == '#FFD500') {
+        offset = 0;
+    }
 
-function drawHeader() {
-    erase();
-    rect(holdWidth * unitSize, 0, boardWidth * unitSize, headerHeight * unitSize);
-    noErase();
+    let heldDrawBlock = new Block(held.color, [holdx - holdWidth + 1 + offset, holdy + headerHeight + 1]);
+    this.drawBlock(heldDrawBlock, held.color);
 }
 
 function drawGhost(block) {
@@ -219,3 +226,14 @@ function drawGhost(block) {
     while (board.moveBlockDown(ghost));
     return drawBlock(ghost, ghostColor);
 }
+
+function drawGameOver() {
+    console.log("Game Over");
+}
+
+function drawScore() {
+    textSize(32);
+    fill('white');
+    text(board.score, holdWidth * unitSize + 10, 32);
+}
+
