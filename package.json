@@ -1,0 +1,23 @@
+{
+  "name": "tetrisjs",
+  "version": "1.0.0",
+  "description": "Tetris in javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brianzhao1/tetrisjs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brianzhao1/tetrisjs/issues"
+  },
+  "homepage": "https://github.com/brianzhao1/tetrisjs#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
