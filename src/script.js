@@ -10,7 +10,7 @@ var colors = [
 
 var holdWidth = 6,
     queueWidth = 6,
-    boardWidth = 10,
+    boardWidth = 14,
     boardHeight = 24,
     headerHeight = 2,
     unitSize = 35,
@@ -182,18 +182,30 @@ function drawQueue() {
     erase();
     rect((holdWidth + boardWidth) * unitSize, 0, queueWidth * unitSize, boardHeight * unitSize);
     noErase();
+
     let queuex = boardWidth + 1,
-        queuey = 1 + headerHeight,
-        offset = 0.5;
+        queuey = 1 + headerHeight;
+    offsetx = 0,
+        offsety = 0;
+
     for (let i = 0; i < 3; i++) {
-        let queueColor = queue[i],
-            offset;
+        let queueColor = queue[i];
+
         if (queueColor == '#00DBFF' || queueColor == '#FFD500') {
-            offset = 0;
+            offsetx = 0;
         } else {
-            offset = 0.5;
+            offsetx = 0.5;
         }
-        let queueBlock = new Block(queueColor, [queuex + offset, queuey]);
+
+        if (queueColor == '#00DBFF') {
+            offsety = 0.5;
+        } else if (queueColor == '#FFD500' || queueColor == '#FF3213' || queueColor == '#72CB3B') {
+            offsety = 0;
+        } else {
+            offsety = -1;
+        }
+
+        let queueBlock = new Block(queueColor, [queuex + offsetx, queuey - offsety]);
         this.drawBlock(queueBlock, queueColor);
         queuey += 4;
     }
@@ -211,11 +223,23 @@ function drawHold() {
         return;
     }
 
+    let offsetx,
+        offsety;
     if (held.color == '#00DBFF' || held.color == '#FFD500') {
-        offset = 0;
+        offsetx = 0;
+    } else {
+        offsetx = 0.5;
     }
 
-    let heldDrawBlock = new Block(held.color, [holdx - holdWidth + 1 + offset, holdy + headerHeight + 1]);
+    if (held.color == '#00DBFF') {
+        offsety = 0.5;
+    } else if (held.color == '#FFD500' || held.color == '#FF3213' || held.color == '#72CB3B') {
+        offsety = 0;
+    } else {
+        offsety = -1;
+    }
+
+    let heldDrawBlock = new Block(held.color, [holdx - holdWidth + 1 + offsetx, holdy + headerHeight + 1 - offsety]);
     this.drawBlock(heldDrawBlock, held.color);
 }
 

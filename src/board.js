@@ -1,4 +1,4 @@
-var boardWidth = 10,
+var boardWidth = 14,
     boardHeight = 24,
     kickBound = 3;
 
@@ -138,7 +138,7 @@ class Board {
     }
 
     isOccupiedAt(x, y) {
-        return this.grid[x][y];
+        return this.grid[floor(x)][floor(y)];
     }
 
     copy() {
