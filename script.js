@@ -10,13 +10,14 @@ var colors = [
 
 var holdWidth = 6,
     queueWidth = 6,
-    boardWidth = 24,
+    boardWidth = 10,
     boardHeight = 24,
     headerHeight = 2,
     unitSize = 35,
     gravity = 2,
-    currentx = (boardWidth - 4) / 2,
-    currenty = 0;
+    currentx = Math.ceil((boardWidth - 4) / 2),
+    currenty = 0,
+    borderRadius = 1;
 
 var incomingColor,
     incoming,
@@ -58,12 +59,12 @@ function draw() {
     if (keyIsDown(DOWN_ARROW)) {
         setTimeout(board.moveBlockDown(incoming), 1000);
     }
-    if (frameCount % 10 == 0 && keyIsDown(LEFT_ARROW)) {
-        board.moveBlockLeft(incoming);
-    }
-    if (frameCount % 10 == 0 && keyIsDown(RIGHT_ARROW)) {
-        setTimeout(board.moveBlockRight(incoming), 1000);
-    }
+    // if (frameCount % 10 == 0 && keyIsDown(LEFT_ARROW)) {
+    //     board.moveBlockLeft(incoming);
+    // }
+    // if (frameCount % 10 == 0 && keyIsDown(RIGHT_ARROW)) {
+    //     setTimeout(board.moveBlockRight(incoming), 1000);
+    // }
 }
 
 function keyPressed() {
@@ -150,7 +151,7 @@ function drawBlock(block, blockColor) {
             return false;
         }
 
-        rect(finalx, finaly, unitSize, unitSize);
+        rect(finalx, finaly, unitSize, unitSize, borderRadius);
         stroke(0);
         if (blockColor != 'gray') {
             // line(finalx, finaly, finalx + unitSize, finaly + unitSize);
@@ -170,7 +171,7 @@ function drawBoard() {
             fill(c);
             c.setAlpha(255);
             // fill(blockColor);
-            rect((col + holdWidth) * unitSize, row * unitSize, unitSize, unitSize);
+            rect((col + holdWidth) * unitSize, row * unitSize, unitSize, unitSize, borderRadius);
         }
     }
 }
@@ -212,7 +213,9 @@ function drawHeader() {
 }
 
 function drawGhost(block) {
-    var ghost = block.copy();
+    var ghost = block.copy(),
+        ghostColor = color(block.color);
+    ghostColor.setAlpha(120);
     while (board.moveBlockDown(ghost));
-    return drawBlock(ghost, 'gray');
+    return drawBlock(ghost, ghostColor);
 }

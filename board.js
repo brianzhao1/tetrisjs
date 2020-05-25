@@ -1,5 +1,6 @@
-var boardWidth = 24,
-    boardHeight = 24;
+var boardWidth = 10,
+    boardHeight = 24,
+    kickBound = 3;
 
 function getNewGrid() {
     var grid = [];
@@ -44,8 +45,23 @@ class Board {
     }
 
     rotateBlockLeft(block) {
-        while (!this.simulate(block, block.rotateLeft) && this.moveBlockRight(block));
-        while (!this.simulate(block, block.rotateLeft) && this.moveBlockLeft(block));
+        let boundRight = 0,
+            boundLeft = 0;
+        if (!this.simulate(block, block.rotateLeft)) {
+            let kickResult = this.kick(block, block.rotateLeft),
+                kickx = kickResult[0],
+                kicky = kickResult[1];
+            console.log(kickx, kicky);
+            for (let i = 0; i < kicky; i++) {
+                block.moveDown();
+            }
+            for (let j = 0; j < kickx; j++) {
+                block.moveRight();
+            }
+            for (let k = 0; k < -kickx; k++) {
+                block.moveLeft();
+            }
+        }
         if (this.simulate(block, block.rotateLeft)) {
             block.rotateLeft();
             return true;
@@ -54,8 +70,23 @@ class Board {
     }
 
     rotateBlockRight(block) {
-        while (!this.simulate(block, block.rotateRight) && this.moveBlockRight(block));
-        while (!this.simulate(block, block.rotateRight) && this.moveBlockLeft(block));
+        let boundRight = 0,
+            boundLeft = 0;
+        if (!this.simulate(block, block.rotateRight)) {
+            let kickResult = this.kick(block, block.rotateRight),
+                kickx = kickResult[0],
+                kicky = kickResult[1];
+            console.log(kickx, kicky);
+            for (let i = 0; i < kicky; i++) {
+                block.moveDown();
+            }
+            for (let j = 0; j < kickx; j++) {
+                block.moveRight();
+            }
+            for (let k = 0; k < -kickx; k++) {
+                block.moveLeft();
+            }
+        }
         if (this.simulate(block, block.rotateRight)) {
             block.rotateRight();
             return true;
@@ -143,6 +174,31 @@ class Board {
         testFunc();
 
         return tempBoard.validate(tempBlock);
+    }
+
+    kick(block, action) {
+        var kickDisp = 0;
+        let kickBoard = this.copy(),
+            kickBlock = block.copy();
+
+        var kickFunc = action.bind(kickBlock);
+        kickFunc();
+        for (let dx = 0; dx < kickBound; dx++) {
+            for (let dy = 0; dy < kickBound; dy++) {
+                kickBlock.position[0] += dx;
+                kickBlock.position[1] += dy;
+                if (kickBoard.validate(kickBlock)) {
+                    return [dx, dy];
+                }
+                kickBlock.position[0] -= 2 * dx;
+                if (kickBoard.validate(kickBlock)) {
+                    return [-dx, dy];
+                }
+                kickBlock.position[1] -= dy;
+            }
+        }
+
+        return [0, 0];
     }
 }
 
