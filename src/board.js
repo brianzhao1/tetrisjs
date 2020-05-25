@@ -1,4 +1,4 @@
-var boardWidth = 14,
+var boardWidth = 10,
     boardHeight = 24,
     kickBound = 3;
 

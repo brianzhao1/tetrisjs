@@ -10,14 +10,15 @@ var colors = [
 
 var holdWidth = 6,
     queueWidth = 6,
-    boardWidth = 14,
+    boardWidth = 10,
     boardHeight = 24,
     headerHeight = 2,
     unitSize = 35,
     gravity = 2,
     currentx = Math.ceil((boardWidth - 4) / 2),
     currenty = 0,
-    borderRadius = 1;
+    borderRadius = 1,
+    startingLevel = 0;
 
 var incomingColor,
     incoming,
@@ -26,13 +27,19 @@ var incomingColor,
     iteration,
     board,
     queue,
-    lockCount;
+    lockCount,
+    level;
+
+function preload() {
+    Noto = loadFont('assets/NotoSansJP.otf');
+}
 
 function setup() {
     var cnv = createCanvas((holdWidth + boardWidth + queueWidth) * unitSize, (boardHeight - headerHeight) * unitSize);
     cnv.parent("game");
     cnv.id("tetris");
     board = new Board();
+    level = startingLevel;
     iteration = 0;
     queue = [];
     usedHold = false;
@@ -46,28 +53,32 @@ function draw() {
     drawHold();
     drawBoard();
 
-    let result = drawBlock(incoming, incoming.color);
+    let result = drawBlock(incoming, incoming.color),
+        fall = true;
     if (!result) {
         gameOver();
     }
     drawGhost(incoming);
 
-    if (frameCount % 20 == 0) {
-        let fall = board.moveBlockDown(incoming);
+    if (frameCount % framesAtLevel() == 0) {
+        fall = board.moveBlockDown(incoming);
+    }
+
+    if (frameCount % 30 == 0) {
         if (!fall) {
             lockCount++;
         } else {
             lockCount = 0;
         }
-
     }
-
     if (lockCount > 1) {
         board.setBlock(incoming);
         usedHold = false;
         refresh();
     }
 
+    drawCurrentLevel();
+    drawNextLevel();
     drawScore();
     if (keyIsDown(DOWN_ARROW)) {
         setTimeout(board.moveBlockDown(incoming), 1000);
@@ -98,6 +109,7 @@ function gameOver() {
     drawGameOver();
     // setTimeout(() => { board = new Board(); }, 2000);
     board = new Board();
+    level = startingLevel;
 }
 
 function holdBlock(block) {
@@ -134,6 +146,17 @@ function shuffleColors() {
         [bag[i], bag[j]] = [bag[j], bag[i]];
     }
     queue.push(...bag);
+}
+
+function toNextLevel() {
+    if (level == startingLevel) {
+        return min(level * 10 + 10, max(100, level * 10 - 50));
+    }
+    return 10 * level; //
+}
+
+function framesAtLevel() {
+    return [48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1][min(level, 29)]
 }
 
 function drawBlock(block, blockColor) {
@@ -255,9 +278,29 @@ function drawGameOver() {
     console.log("Game Over");
 }
 
-function drawScore() {
-    textSize(32);
-    fill('white');
-    text(board.score, holdWidth * unitSize + 10, 32);
+function drawCurrentLevel() {
+    textSize(40);
+    textFont(Noto)
+    textAlign(CENTER);
+    fill(0);
+    text("Level " + level, 0, 14.5 * unitSize, (holdWidth + 0.5) * unitSize);
 }
 
+function drawNextLevel() {
+    textSize(90);
+    textFont(Noto)
+    textAlign(CENTER);
+    fill(0);
+    if (board.score >= this.toNextLevel()) {
+        level++;
+    }
+    text(this.toNextLevel() - board.score, 0, 17.5 * unitSize, (holdWidth + 1) * unitSize);
+}
+
+function drawScore() {
+    textSize(24);
+    textFont(Noto)
+    textAlign(CENTER);
+    fill(0);
+    text('Score: ' + board.score, 0, 19 * unitSize, (holdWidth + 0.5) * unitSize);
+}
