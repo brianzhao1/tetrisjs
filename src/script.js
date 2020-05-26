@@ -18,7 +18,8 @@ var holdWidth = 6,
     currentx = Math.ceil((boardWidth - 4) / 2),
     currenty = 0,
     borderRadius = 1,
-    startingLevel = 0;
+    startingLevel = 0,
+    fall = true;
 
 var incomingColor,
     incoming,
@@ -53,8 +54,7 @@ function draw() {
     drawHold();
     drawBoard();
 
-    let result = drawBlock(incoming, incoming.color),
-        fall = true;
+    let result = drawBlock(incoming, incoming.color);
     if (!result) {
         gameOver();
     }
@@ -71,6 +71,7 @@ function draw() {
             lockCount = 0;
         }
     }
+
     if (lockCount > 1) {
         board.setBlock(incoming);
         usedHold = false;
