@@ -51,7 +51,7 @@ class Board {
             let kickResult = this.kick(block, block.rotateLeft),
                 kickx = kickResult[0],
                 kicky = kickResult[1];
-            console.log(kickx, kicky);
+            // console.log(kickx, kicky);
             for (let i = 0; i < kicky; i++) {
                 block.moveDown();
             }
@@ -76,7 +76,7 @@ class Board {
             let kickResult = this.kick(block, block.rotateRight),
                 kickx = kickResult[0],
                 kicky = kickResult[1];
-            console.log(kickx, kicky);
+            // console.log(kickx, kicky);
             for (let i = 0; i < kicky; i++) {
                 block.moveDown();
             }
