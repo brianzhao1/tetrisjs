@@ -1,12 +1,12 @@
-var colors = [
-  "#00DBFF", // aqua
-  "#FF971C", // orange
-  "#0341AE", // blue
-  "#FFD500", // yellow
-  "#FF3213", // red
-  "#72CB3B", // green
-  "#5E058B", // purple
-];
+var AQUA = "#00DBFF",
+  ORANGE = "#FF971C",
+  BLUE = "#0341AE",
+  YELLOW = "#FFD500",
+  RED = "#FF3213",
+  GREEN = "#72CB3B",
+  PURPLE = "#5E058B";
+
+var colors = [AQUA, ORANGE, BLUE, YELLOW, RED, GREEN, PURPLE];
 
 var positions = [
   [

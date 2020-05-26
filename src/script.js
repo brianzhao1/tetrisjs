@@ -1,25 +1,24 @@
-var colors = [
-  "#00DBFF", // aqua
-  "#FF971C", // orange
-  "#0341AE", // blue
-  "#FFD500", // yellow
-  "#FF3213", // red
-  "#72CB3B", // green
-  "#5E058B", // purple
-];
+var AQUA = "#00DBFF",
+  ORANGE = "#FF971C",
+  BLUE = "#0341AE",
+  YELLOW = "#FFD500",
+  RED = "#FF3213",
+  GREEN = "#72CB3B",
+  PURPLE = "#5E058B";
 
 var holdWidth = 6,
   queueWidth = 6,
   boardWidth = 10,
   boardHeight = 24,
   headerHeight = 2,
-  unitSize = 25,
+  unitSize = 30,
   gravity = 2,
   currentx = Math.ceil((boardWidth - 4) / 2),
   currenty = 0,
-  borderRadius = 1,
+  borderRadius = 0,
   startingLevel = 0,
-  fall = true;
+  fall = true,
+  shouldContinue = true;
 
 var incomingColor,
   incoming,
@@ -34,6 +33,20 @@ var incomingColor,
   linesFont,
   scoreFont,
   descFont;
+
+var colors = [AQUA, ORANGE, BLUE, YELLOW, RED, GREEN, PURPLE];
+
+window.addEventListener("keydown", function (e) {
+  if (
+    (e.keyCode == 32 ||
+      e.keyCode == LEFT_ARROW ||
+      e.keyCode == RIGHT_ARROW ||
+      e.keyCode == DOWN_ARROW) &&
+    e.target == document.body
+  ) {
+    e.preventDefault(); // prevents spacebar and arrows from scrolling
+  }
+});
 
 function preload() {
   (levelFont = loadFont("assets/roboto_level.ttf")),
@@ -66,28 +79,29 @@ function draw() {
 
   let result = drawBlock(incoming, incoming.color);
   if (!result) {
-    gameOver();
+    this.gameOver();
   }
   drawGhost(incoming);
 
-  if (frameCount % framesAtLevel() == 0) {
-    fall = board.moveBlockDown(incoming);
-  }
+  if (shouldContinue) {
+    if (frameCount % framesAtLevel() == 0) {
+      fall = board.moveBlockDown(incoming);
+    }
 
-  if (frameCount % 30 == 0) {
-    if (!fall) {
-      lockCount++;
-    } else {
-      lockCount = 0;
+    if (frameCount % 30 == 0) {
+      if (!fall) {
+        lockCount++;
+      } else {
+        lockCount = 0;
+      }
+    }
+
+    if (lockCount > 1) {
+      board.setBlock(incoming);
+      usedHold = false;
+      refresh();
     }
   }
-
-  if (lockCount > 1) {
-    board.setBlock(incoming);
-    usedHold = false;
-    refresh();
-  }
-
   this.drawCurrentLevel();
   this.drawNextLevel();
   this.drawScore();
@@ -121,8 +135,12 @@ function keyPressed() {
 
 function gameOver() {
   drawGameOver();
-  // setTimeout(() => { board = new Board(); }, 2000);
-  board = new Board();
+  shouldContinue = false;
+  setTimeout(() => {
+    board = new Board();
+    shouldContinue = true;
+  }, 2200);
+  // board = new Board();
   level = startingLevel;
 }
 
@@ -166,7 +184,7 @@ function toNextLevel() {
   if (level == startingLevel) {
     return min(level * 10 + 10, max(100, level * 10 - 50));
   }
-  return 10 * level; //
+  return 10 * (level + 1); //
 }
 
 function framesAtLevel() {
@@ -343,19 +361,40 @@ function drawGhost(block) {
 }
 
 function drawGameOver() {
+  textSize((95 * unitSize) / 35);
+  textFont(linesFont);
+  textAlign(CENTER);
+  let gameOverColor = color(255);
+  // gameOverColor.setAlpha(255);
+  fill(gameOverColor);
+  // strokeWeight(1.5);
+  text(
+    "GAME",
+    (holdWidth + 0.3) * unitSize,
+    10.5 * unitSize,
+    boardWidth * unitSize
+  );
+  text(
+    "OVER",
+    (holdWidth + 0.3) * unitSize,
+    13 * unitSize,
+    boardWidth * unitSize
+  );
+  // strokeWeight(0);
   console.log("Game Over");
 }
 
 function drawCurrentLevel() {
-  textSize(30);
+  textSize((30 * unitSize) / 35);
   textFont(levelFont);
   textAlign(CENTER);
-  fill(0);
-  text("LEVEL " + level, 0, 15 * unitSize, (holdWidth + 0.2) * unitSize);
+  fill("#CC0D22");
+  strokeWeight(1);
+  text("LEVEL " + level, 0, 15 * unitSize, (holdWidth + 0.3) * unitSize);
 }
 
 function drawNextLevel() {
-  textSize(90);
+  textSize((90 * unitSize) / 35);
   textFont(linesFont);
   textAlign(CENTER);
   fill(0);
@@ -366,7 +405,7 @@ function drawNextLevel() {
     this.toNextLevel() - board.score,
     0,
     17.5 * unitSize,
-    (holdWidth + 0.7) * unitSize
+    (holdWidth + 0.5) * unitSize
   );
   // textSize(15);
   // textFont(descFont);
@@ -374,13 +413,16 @@ function drawNextLevel() {
 }
 
 function drawScore() {
-  textSize(20);
+  textSize((20 * unitSize) / 35);
   textFont(scoreFont);
   textAlign(CENTER);
+  fill(0);
+  strokeWeight(0);
   text(
     "SCORE:  " + board.score,
     0,
-    18.75 * unitSize,
+    18.6 * unitSize,
     (holdWidth + 0.3) * unitSize
   );
+  // strokeWeight(1.3);
 }
