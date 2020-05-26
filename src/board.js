@@ -185,16 +185,49 @@ class Board {
         kickFunc();
         for (let dx = 0; dx < kickBound; dx++) {
             for (let dy = 0; dy < kickBound; dy++) {
-                kickBlock.position[0] += dx;
-                kickBlock.position[1] += dy;
-                if (kickBoard.validate(kickBlock)) {
+                for (let dxi = 0; dxi < dx; dxi++) {
+                    kickBlock.moveRight();
+                }
+
+                for (let dyi = 0; dyi < dy; dyi++) {
+                    kickBlock.moveDown();
+                }
+
+                if (!(dx == 0 && dy == 0) && kickBoard.validate(kickBlock)) {
                     return [dx, dy];
                 }
-                kickBlock.position[0] -= 2 * dx;
-                if (kickBoard.validate(kickBlock)) {
-                    return [-dx, dy];
+
+                for (let dxi = 0; dxi < dx; dxi++) {
+                    kickBlock.moveLeft();
                 }
-                kickBlock.position[1] -= dy;
+
+                for (let dyi = 0; dyi < dy; dyi++) {
+                    kickBlock.moveUp();
+                }
+            }
+        }
+
+        for (let dx = -1; dx > -kickBound; dx--) {
+            for (let dy = 0; dy < kickBound; dy++) {
+                for (let dxi = 0; dxi < abs(dx); dxi++) {
+                    kickBlock.moveLeft();
+                }
+
+                for (let dyi = 0; dyi < dy; dyi++) {
+                    kickBlock.moveDown();
+                }
+
+                if (!(dx == 0 && dy == 0) && kickBoard.validate(kickBlock)) {
+                    return [dx, dy];
+                }
+
+                for (let dxi = 0; dxi < abs(dx); dxi++) {
+                    kickBlock.moveRight();
+                }
+
+                for (let dyi = 0; dyi < dy; dyi++) {
+                    kickBlock.moveUp();
+                }
             }
         }
 

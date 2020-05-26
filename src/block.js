@@ -93,6 +93,10 @@ class Block {
         this.position[1] += 1;
     }
 
+    moveUp() {
+        this.position[1] -= 1;
+    }
+
     rotateLeft() {
         this.delta += 1;
     }
