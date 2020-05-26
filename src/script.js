@@ -29,10 +29,17 @@ var incomingColor,
     board,
     queue,
     lockCount,
-    level;
+    level,
+    levelFont,
+    linesFont,
+    scoreFont,
+    descFont;
 
 function preload() {
-    Noto = loadFont('assets/NotoSansJP.otf');
+    levelFont = loadFont('assets/roboto_level.ttf'),
+        linesFont = loadFont('assets/roboto_lines.ttf'),
+        scoreFont = loadFont('assets/roboto_score.ttf'),
+        descFont = loadFont('assets/roboto_desc.ttf');
 }
 
 function setup() {
@@ -280,28 +287,30 @@ function drawGameOver() {
 }
 
 function drawCurrentLevel() {
-    textSize(40);
-    textFont(Noto)
+    textSize(30);
+    textFont(levelFont);
     textAlign(CENTER);
     fill(0);
-    text("Level " + level, 0, 14.5 * unitSize, (holdWidth + 0.5) * unitSize);
+    text("LEVEL " + level, 0, 15 * unitSize, (holdWidth + 0.2) * unitSize);
 }
 
 function drawNextLevel() {
     textSize(90);
-    textFont(Noto)
+    textFont(linesFont);
     textAlign(CENTER);
     fill(0);
     if (board.score >= this.toNextLevel()) {
         level++;
     }
-    text(this.toNextLevel() - board.score, 0, 17.5 * unitSize, (holdWidth + 1) * unitSize);
+    text(this.toNextLevel() - board.score, 0, 17.5 * unitSize, (holdWidth + 0.7) * unitSize);
+    // textSize(15);
+    // textFont(descFont);
+    // text('to next level', 0, 18.5 * unitSize, (holdWidth + 0.1) * unitSize);
 }
 
 function drawScore() {
-    textSize(24);
-    textFont(Noto)
+    textSize(20);
+    textFont(scoreFont)
     textAlign(CENTER);
-    fill(0);
-    text('Score: ' + board.score, 0, 19 * unitSize, (holdWidth + 0.5) * unitSize);
+    text('SCORE:  ' + board.score, 0, 18.75 * unitSize, (holdWidth + 0.3) * unitSize);
 }
