@@ -53,6 +53,7 @@ function preload() {
     (linesFont = loadFont("assets/roboto_lines.ttf")),
     (scoreFont = loadFont("assets/roboto_score.ttf")),
     (descFont = loadFont("assets/roboto_desc.ttf"));
+  frameRate(50);
 }
 
 function setup() {
