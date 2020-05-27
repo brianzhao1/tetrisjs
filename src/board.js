@@ -107,7 +107,9 @@ class Board {
       this.grid[finaly][finalx] = block.color;
     }
 
-    this.score += this.clearLines();
+    const scoreDelta = this.clearLines();
+    this.score += scoreDelta;
+    return scoreDelta;
   }
 
   clearLines() {

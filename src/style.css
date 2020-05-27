@@ -1,4 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Italianno&display=swap');
+
+@font-face {
+  font-family: Astrolab;
+  src: url("./assets/astrolab.ttf");
+}
 
 * {
   font-family: "Noto Sans JP";
@@ -30,6 +36,24 @@ header > h1 {
   display: block;
   background: #ebf7ff;
   border-radius: 50px;
+}
+
+#score {
+  text-align: center;
+  display: block;
+}
+
+#scoreWord {
+  font-family: "Italianno", cursive;
+  font-size: 60px;
+  font-color: #656565;
+  position: relative;
+  bottom: 2px;
+}
+
+#scoreValue {
+  font-family: "Astrolab";
+  font-size: 35px;
 }
 
 #instructions div {
