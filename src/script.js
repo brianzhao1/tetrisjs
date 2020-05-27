@@ -6,6 +6,9 @@ var AQUA = '#00DBFF',
   GREEN = '#72CB3B',
   PURPLE = '#5E058B';
 
+const DROP_MULTIPLIER = 2;
+const SOFT_MULTIPLIER = 1;
+
 var holdWidth = 6,
   queueWidth = 6,
   boardWidth = 10,
@@ -16,7 +19,7 @@ var holdWidth = 6,
   currentx = Math.ceil((boardWidth - 4) / 2),
   currenty = 0,
   borderRadius = 0,
-  startingLevel = 0,
+  startingLevel = 1,
   fall = true,
   shouldContinue = true;
 
@@ -100,10 +103,10 @@ function draw() {
 
     if (lockCount > 1) {
       usedHold = false;
-      let linesCleared = board.setBlock(incoming);
-      dispScore += addScore(linesCleared);
-      setScore(dispScore);
-
+      const setResult = board.setBlock(incoming);
+      const linesCleared = setResult[0];
+      const linesDropped = setResult[1];
+      addScore(getPoints(linesCleared) + DROP_MULTIPLIER * linesDropped);
       refresh();
     }
   }
@@ -123,9 +126,10 @@ function keyPressed() {
     board.moveBlockDown(incoming);
   } else if (key === ' ') {
     usedHold = false;
-    let linesCleared = board.setBlock(incoming);
-    dispScore += addScore(linesCleared);
-    setScore(dispScore);
+    const setResult = board.setBlock(incoming);
+    const linesCleared = setResult[0];
+    const linesDropped = setResult[1];
+    addScore(getPoints(linesCleared) + DROP_MULTIPLIER * linesDropped);
 
     refresh();
   } else if (keyCode === 67) {
@@ -184,8 +188,13 @@ function refresh() {
   lockCount = 0;
 }
 
-function addScore(linesCleared) {
-  return [0, 40, 100, 300, 1200][linesCleared] * (level + 1);
+function getPoints(linesCleared) {
+  return [0, 100, 300, 500, 1200][linesCleared] * level;
+}
+
+function addScore(scoreToAdd) {
+    dispScore += scoreToAdd;
+    setScore(dispScore);
 }
 
 function numberWithCommas(x) {
@@ -206,13 +215,14 @@ function shuffleColors() {
 
 function toNextLevel() {
   if (level === startingLevel) {
-    return min(level * 10 + 10, max(100, level * 10 - 50));
+    return min(level * 10, max(100, level * 10 - 50));
   }
-  return level * 10 + 10;
+  return level * 10;
 }
 
 function framesAtLevel() {
   return [
+    50,
     48,
     43,
     38,
@@ -243,7 +253,7 @@ function framesAtLevel() {
     2,
     2,
     1,
-  ][min(level, 29)];
+  ][min(level, 30)];
 }
 
 function drawBlock(block, blockColor) {

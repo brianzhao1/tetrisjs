@@ -95,7 +95,10 @@ class Board {
   }
 
   setBlock(block) {
-    while (this.moveBlockDown(block));
+    let linesDropped = 0;
+    while (this.moveBlockDown(block)) {
+      linesDropped += 1;
+    }
     let startx = block.x,
       starty = block.y;
 
@@ -109,7 +112,7 @@ class Board {
 
     const scoreDelta = this.clearLines();
     this.score += scoreDelta;
-    return scoreDelta;
+    return [scoreDelta, linesDropped];
   }
 
   clearLines() {
