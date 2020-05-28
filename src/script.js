@@ -36,7 +36,8 @@ var incomingColor,
   linesFont,
   scoreFont,
   descFont,
-  dispScore;
+  dispScore,
+  actions;
 
 var colors = [AQUA, ORANGE, BLUE, YELLOW, RED, GREEN, PURPLE];
 
@@ -73,6 +74,7 @@ function setup() {
   queue = [];
   usedHold = false;
   dispScore = 0;
+  actions = [];
   shuffleColors();
   refresh();
 }
@@ -90,10 +92,16 @@ function draw() {
   drawGhost(incoming);
 
   if (shouldContinue) {
+    this.willContinue();
+  }
+  this.drawLevelBadge();
+  this.execute();
+}
+
+function willContinue() {
     if (frameCount % framesAtLevel() === 0) {
       fall = board.moveBlockDown(incoming);
     }
-
     if (frameCount % 30 === 0) {
       if (!fall) {
         lockCount++;
@@ -109,40 +117,66 @@ function draw() {
       const linesDropped = setResult[1];
       addScore(getPoints(linesCleared) + DROP_MULTIPLIER * linesDropped);
       refresh();
-    }
-  }
-  this.drawLevelBadge();
 
+}}
+
+function execute() {
+  const recentAction = actions.shift();
+  parseAction(recentAction);
   if (keyIsDown(DOWN_ARROW)) {
-    setTimeout(board.moveBlockDown(incoming), 1000);
+    actions.push('v');
+  }
+}
+
+function parseAction(action) {
+  switch (action) {
+    case '<':
+      board.moveBlockLeft(incoming);
+      break;
+    case '>':
+      board.moveBlockRight(incoming);
+      break;
+    case 'v':
+      board.moveBlockDown(incoming);
+      break;
+    case ' ':
+      space();
+      break;
+    case 'c':
+      holdBlock(incoming);
+      break;
+    case 'x':
+      board.rotateBlockLeft(incoming);
+      break;
+    case 'z':
+      board.rotateBlockRight(incoming);
+      break;
   }
 }
 
 function keyPressed() {
   if (keyCode === LEFT_ARROW) {
-    board.moveBlockLeft(incoming);
+    actions.push('<');
   } else if (keyCode === RIGHT_ARROW) {
-    board.moveBlockRight(incoming);
-  } else if (keyCode === DOWN_ARROW) {
-    board.moveBlockDown(incoming);
+    actions.push('>');
   } else if (key === ' ') {
-    usedHold = false;
-    const setResult = board.setBlock(incoming);
-    const linesCleared = setResult[0];
-    const linesDropped = setResult[1];
-    addScore(getPoints(linesCleared) + DROP_MULTIPLIER * linesDropped);
-
-    refresh();
+    actions.push(' ');
   } else if (keyCode === 67) {
-    // c
-    holdBlock(incoming);
+    actions.push('c');
   } else if (keyCode === 88) {
-    // x
-    board.rotateBlockLeft(incoming);
+    actions.push('x');
   } else if (keyCode === 90) {
-    // z
-    board.rotateBlockRight(incoming);
+    actions.push('z');
   }
+}
+
+function space() {
+  usedHold = false;
+  const setResult = board.setBlock(incoming);
+  const linesCleared = setResult[0];
+  const linesDropped = setResult[1];
+  addScore(getPoints(linesCleared) + DROP_MULTIPLIER * linesDropped);
+  refresh();
 }
 
 function setScore(points) {
