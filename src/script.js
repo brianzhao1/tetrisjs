@@ -55,12 +55,13 @@ window.addEventListener('keydown', function (e) {
 function preload() {
   (levelFont = loadFont('assets/roboto_level.ttf')),
     (linesFont = loadFont('assets/roboto_lines.ttf')),
+    (scoreFont = loadFont('assets/astrolab.ttf'));
     (descFont = loadFont('assets/italianno.ttf'));
   frameRate(50);
 }
 
 function setup() {
-  var cnv = createCanvas(
+  let cnv = createCanvas(
     (holdWidth + boardWidth + queueWidth) * unitSize,
     (boardHeight - headerHeight) * unitSize
   );
@@ -146,7 +147,6 @@ function keyPressed() {
 
 function setScore(points) {
   let scoreDiv = document.getElementById('scoreValue');
-  console.log(scoreDiv);
   scoreDiv.textContent = points;
 }
 
@@ -159,7 +159,6 @@ function gameOver() {
     dispScore = 0;
     setScore(dispScore);
   }, 2200);
-  // board = new Board();
   board.score = 0;
   level = startingLevel;
 }
@@ -177,12 +176,9 @@ function holdBlock(block) {
 }
 
 function refresh() {
-  // console.log(board.grid);
-  // console.log(incoming);
   if (queue.length <= 3) {
     shuffleColors();
   }
-  // iteration = (iteration + 1) % colors.length;
   incomingColor = queue.shift();
   incoming = new Block(incomingColor, [currentx, currenty]);
   lockCount = 0;
@@ -430,8 +426,8 @@ function drawCurrentLevel() {
 }
 
 function drawNextLevel() {
-  textSize((90 * unitSize) / 35);
-  textFont(linesFont);
+  textSize((65 * unitSize) / 35);
+  textFont(scoreFont);
   textAlign(CENTER);
   fill(0);
   if (board.score >= this.toNextLevel()) {
@@ -440,7 +436,7 @@ function drawNextLevel() {
   text(
     this.toNextLevel() - board.score,
     0,
-    19 * unitSize,
+    18.5 * unitSize,
     (holdWidth + 0.5) * unitSize,
   );
   // textSize(15);
@@ -457,8 +453,8 @@ function drawLevelDesc() {
   text(
     'to next level',
     0,
-    20 * unitSize,
-    (holdWidth + 0.3) * unitSize,
+    19.5 * unitSize,
+    (holdWidth + 0.1) * unitSize,
   );
 }
 
